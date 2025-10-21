@@ -2,9 +2,12 @@
 
 ## Relevant Files
 
-- `venvman.py` - Main CLI tool implementation containing all commands and core logic
-- `README.md` - User-facing documentation with installation instructions, usage examples, and troubleshooting guide
-- `.gitignore` - Git ignore patterns to exclude generated files and virtual environments (optional but recommended)
+- `venvman.py` - Main CLI tool implementation containing all commands (list, create, delete, info) and core logic (390 lines)
+- `README.md` - Comprehensive user-facing documentation with installation instructions, usage examples, troubleshooting guide, and architecture explanation
+- `.gitignore` - Git ignore patterns to exclude Python artifacts, virtual environments, and IDE files
+- `venv_manager_spec.md` - Original specification document (reference implementation)
+- `tasks/0001-prd-centralized-venv-manager.md` - Product Requirements Document
+- `tasks/tasks-0001-prd-centralized-venv-manager.md` - This task list with all implementation tasks
 
 ### Notes
 
@@ -104,19 +107,19 @@
   - [x] 7.9 If installation fails, print warning but continue with symlink/script creation (FR6)
   - [x] 7.10 Print success/failure message for dependency installation
 
-- [ ] 8.0 Create comprehensive documentation (README with examples)
-  - [ ] 8.1 Create README.md file
-  - [ ] 8.2 Add project title and brief description
-  - [ ] 8.3 Add "Why use this?" section explaining benefits
-  - [ ] 8.4 Add installation instructions (clone repo, make executable, add to PATH or create alias)
-  - [ ] 8.5 Add "Quick Start" section with basic usage example
-  - [ ] 8.6 Document the `list` command with example
-  - [ ] 8.7 Document the `create` command with all options and examples
-  - [ ] 8.8 Document the `delete` command with examples
-  - [ ] 8.9 Document the `info` command with example output
-  - [ ] 8.10 Add section on `$VENV_HOME` environment variable configuration
-  - [ ] 8.11 Add "How It Works" section explaining the architecture (centralized storage, symlinks, activate.sh)
-  - [ ] 8.12 Add "Troubleshooting" section with common issues and solutions
-  - [ ] 8.13 Add example workflow for setting up a new project
-  - [ ] 8.14 Add notes about .gitignore recommendations (ignore .venv and activate.sh)
-  - [ ] 8.15 Add requirements section (Python 3.10+, Linux/macOS, bash shell)
+- [x] 8.0 Create comprehensive documentation (README with examples)
+  - [x] 8.1 Create README.md file
+  - [x] 8.2 Add project title and brief description
+  - [x] 8.3 Add "Why use this?" section explaining benefits
+  - [x] 8.4 Add installation instructions (clone repo, make executable, add to PATH or create alias)
+  - [x] 8.5 Add "Quick Start" section with basic usage example
+  - [x] 8.6 Document the `list` command with example
+  - [x] 8.7 Document the `create` command with all options and examples
+  - [x] 8.8 Document the `delete` command with examples
+  - [x] 8.9 Document the `info` command with example output
+  - [x] 8.10 Add section on `$VENV_HOME` environment variable configuration
+  - [x] 8.11 Add "How It Works" section explaining the architecture (centralized storage, symlinks, activate.sh)
+  - [x] 8.12 Add "Troubleshooting" section with common issues and solutions
+  - [x] 8.13 Add example workflow for setting up a new project
+  - [x] 8.14 Add notes about .gitignore recommendations (ignore .venv and activate.sh)
+  - [x] 8.15 Add requirements section (Python 3.10+, Linux/macOS, bash shell)
