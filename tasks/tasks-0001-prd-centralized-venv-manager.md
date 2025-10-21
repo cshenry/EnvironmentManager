@@ -42,27 +42,27 @@
   - [x] 3.6 Add subparser for `list` command with help text
   - [x] 3.7 Set command handler function (set_defaults)
 
-- [ ] 4.0 Implement the `create` command with symlink and activation script generation
-  - [ ] 4.1 Create `create_env(args)` function
-  - [ ] 4.2 Add subparser for `create` command with all required/optional arguments (--project, --dir, --python, --force)
-  - [ ] 4.3 Validate that project directory (--dir) exists, exit with error if not (FR8)
-  - [ ] 4.4 Create `$VENV_HOME` directory if it doesn't exist (mkdir with parents=True, exist_ok=True)
-  - [ ] 4.5 Resolve Python interpreter using `find_python()`, exit with error if not found (FR8)
-  - [ ] 4.6 Get actual Python version using `python_version_str()`
-  - [ ] 4.7 Construct environment directory path: `$VENV_HOME/<project>-py<ver>`
-  - [ ] 4.8 Check if environment already exists; if yes, print message and skip creation
-  - [ ] 4.9 Create virtual environment using `python -m venv <env_dir>`, handle creation errors (FR8)
-  - [ ] 4.10 Implement `ensure_symlink(link: Path, target: Path, force: bool)` function
-  - [ ] 4.11 In `ensure_symlink()`, check if link exists and is symlink pointing to correct target (skip if match)
-  - [ ] 4.12 Handle case where .venv exists but is not a symlink (error unless --force, suggest --force in message)
-  - [ ] 4.13 Handle --force flag: remove existing .venv (symlink or directory) before creating new symlink
-  - [ ] 4.14 Create symlink from `<project-dir>/.venv` to environment directory
-  - [ ] 4.15 Implement `write_activate_sh(repo_dir: Path)` function
-  - [ ] 4.16 Generate activate.sh content with proper validation (check .venv is symlink, check activate exists)
-  - [ ] 4.17 Write activate.sh to project directory
-  - [ ] 4.18 Make activate.sh executable (chmod 0o755)
-  - [ ] 4.19 Print success messages showing environment path, symlink, and activate.sh location
-  - [ ] 4.20 Add comprehensive help text for create command
+- [x] 4.0 Implement the `create` command with symlink and activation script generation
+  - [x] 4.1 Create `create_env(args)` function
+  - [x] 4.2 Add subparser for `create` command with all required/optional arguments (--project, --dir, --python, --force)
+  - [x] 4.3 Validate that project directory (--dir) exists, exit with error if not (FR8)
+  - [x] 4.4 Create `$VENV_HOME` directory if it doesn't exist (mkdir with parents=True, exist_ok=True)
+  - [x] 4.5 Resolve Python interpreter using `find_python()`, exit with error if not found (FR8)
+  - [x] 4.6 Get actual Python version using `python_version_str()`
+  - [x] 4.7 Construct environment directory path: `$VENV_HOME/<project>-py<ver>`
+  - [x] 4.8 Check if environment already exists; if yes, print message and skip creation
+  - [x] 4.9 Create virtual environment using `python -m venv <env_dir>`, handle creation errors (FR8)
+  - [x] 4.10 Implement `ensure_symlink(link: Path, target: Path, force: bool)` function
+  - [x] 4.11 In `ensure_symlink()`, check if link exists and is symlink pointing to correct target (skip if match)
+  - [x] 4.12 Handle case where .venv exists but is not a symlink (error unless --force, suggest --force in message)
+  - [x] 4.13 Handle --force flag: remove existing .venv (symlink or directory) before creating new symlink
+  - [x] 4.14 Create symlink from `<project-dir>/.venv` to environment directory
+  - [x] 4.15 Implement `write_activate_sh(repo_dir: Path)` function
+  - [x] 4.16 Generate activate.sh content with proper validation (check .venv is symlink, check activate exists)
+  - [x] 4.17 Write activate.sh to project directory
+  - [x] 4.18 Make activate.sh executable (chmod 0o755)
+  - [x] 4.19 Print success messages showing environment path, symlink, and activate.sh location
+  - [x] 4.20 Add comprehensive help text for create command
 
 - [ ] 5.0 Implement the `delete` command
   - [ ] 5.1 Create `delete_env(args)` function
