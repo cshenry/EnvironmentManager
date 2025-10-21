@@ -15,7 +15,7 @@ A command-line tool that manages Python virtual environments in a centralized lo
 - Clean project repositories (only a symlink, not the full venv)
 - Compatible with VSCode, PyCharm, and other tools that expect `.venv`
 - Simple, consistent activation with `source activate.sh`
-- Easy discovery of all environments with `venvman.py list`
+- Easy discovery of all environments with `venvman list`
 
 ## Requirements
 
@@ -36,25 +36,37 @@ cd EnvironmentManager
 chmod +x venvman.py
 ```
 
-3. (Optional) Add to your PATH or create an alias:
-```bash
-# Add to ~/.bashrc or ~/.zshrc
-alias venvman='/path/to/EnvironmentManager/venvman.py'
+3. (Optional) Use the wrapper script for easier access:
 
-# Or copy to a directory in your PATH
+If you have `~/bin` in your PATH, a wrapper script is already installed:
+```bash
+venvman --help
+```
+
+Otherwise, add an alias to your `~/.bashrc` or `~/.zshrc`:
+```bash
+alias venvman='/path/to/EnvironmentManager/venvman.py'
+```
+
+Or create your own wrapper in a directory in your PATH:
+```bash
+# Example: Copy to ~/.local/bin
 cp venvman.py ~/.local/bin/venvman
+chmod +x ~/.local/bin/venvman
 ```
 
 ## Quick Start
 
 Create a new environment for a project:
 ```bash
-./venvman.py create --project myapp --python 3.12 --dir ~/projects/myapp
+venvman create --project myapp --python 3.12 --dir ~/projects/myapp
 cd ~/projects/myapp
 source activate.sh
 ```
 
 That's it! Your environment is created, symlinked, and ready to use.
+
+**Note:** If you haven't set up the wrapper or alias, use `./venvman.py` instead of `venvman`.
 
 ## Commands
 
@@ -63,7 +75,7 @@ That's it! Your environment is created, symlinked, and ready to use.
 List all virtual environments managed by venvman:
 
 ```bash
-./venvman.py list
+venvman list
 ```
 
 **Example output:**
@@ -78,7 +90,7 @@ webapp-py3.12
 Create a virtual environment and link it into a project directory:
 
 ```bash
-./venvman.py create --project <name> --dir <path> [--python <version>] [--force] [--install-deps]
+venvman create --project <name> --dir <path> [--python <version>] [--force] [--install-deps]
 ```
 
 **Arguments:**
@@ -91,16 +103,16 @@ Create a virtual environment and link it into a project directory:
 **Examples:**
 ```bash
 # Basic usage
-./venvman.py create --project myapp --dir ~/projects/myapp
+venvman create --project myapp --dir ~/projects/myapp
 
 # Specify Python version
-./venvman.py create --project myapp --python 3.12 --dir ~/projects/myapp
+venvman create --project myapp --python 3.12 --dir ~/projects/myapp
 
 # Create and install dependencies
-./venvman.py create --project myapp --dir ~/projects/myapp --install-deps
+venvman create --project myapp --dir ~/projects/myapp --install-deps
 
 # Force replacement of existing .venv
-./venvman.py create --project myapp --dir ~/projects/myapp --force
+venvman create --project myapp --dir ~/projects/myapp --force
 ```
 
 **What it does:**
@@ -115,9 +127,9 @@ Create a virtual environment and link it into a project directory:
 Delete a virtual environment from the centralized storage:
 
 ```bash
-./venvman.py delete --project <name>
+venvman delete --project <name>
 # OR
-./venvman.py delete --env <exact-name>
+venvman delete --env <exact-name>
 ```
 
 **Arguments:**
@@ -127,10 +139,10 @@ Delete a virtual environment from the centralized storage:
 **Examples:**
 ```bash
 # Delete by project name (if only one version exists)
-./venvman.py delete --project myapp
+venvman delete --project myapp
 
 # Delete specific environment
-./venvman.py delete --env myapp-py3.12
+venvman delete --env myapp-py3.12
 ```
 
 **Note:** This command will prompt for confirmation before deletion. Symlinks in project directories are NOT automatically removed.
@@ -140,9 +152,9 @@ Delete a virtual environment from the centralized storage:
 Show detailed information about a virtual environment:
 
 ```bash
-./venvman.py info --project <name>
+venvman info --project <name>
 # OR
-./venvman.py info --env <exact-name>
+venvman info --env <exact-name>
 ```
 
 **Arguments:**
@@ -151,7 +163,7 @@ Show detailed information about a virtual environment:
 
 **Example:**
 ```bash
-./venvman.py info --project myapp
+venvman info --project myapp
 ```
 
 **Example output:**
@@ -175,7 +187,7 @@ Default: `~/VirtualEnvironments`
 Example:
 ```bash
 export VENV_HOME=~/.venvs
-./venvman.py create --project myapp --dir ~/projects/myapp
+venvman create --project myapp --dir ~/projects/myapp
 ```
 
 ## How It Works
@@ -240,7 +252,7 @@ Ensure Python is installed and accessible. Try specifying a version with `--pyth
 You have an existing `.venv` directory or file. Use `--force` to replace it, or remove it manually first.
 
 ### "Environment does not exist" (when using `info` or `delete`)
-Check available environments with `./venvman.py list` and use the exact name with `--env`.
+Check available environments with `venvman list` and use the exact name with `--env`.
 
 ### Tools don't recognize the environment
 The `.venv` symlink should work with most tools (VSCode, PyCharm, etc.). If not, try:
@@ -263,7 +275,7 @@ mkdir ~/projects/myapp
 cd ~/projects/myapp
 
 # 2. Create virtual environment with dependencies
-~/EnvironmentManager/venvman.py create \
+venvman create \
   --project myapp \
   --python 3.12 \
   --dir . \
