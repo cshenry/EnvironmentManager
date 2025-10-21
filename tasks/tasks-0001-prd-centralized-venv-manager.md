@@ -33,14 +33,14 @@
   - [x] 2.6 Add error handling for invalid/non-executable Python interpreters
   - [x] 2.7 Implement environment naming convention: `<project>-py<MAJOR.MINOR>`
 
-- [ ] 3.0 Implement the `list` command
-  - [ ] 3.1 Create `list_envs(args)` function
-  - [ ] 3.2 Check if `$VENV_HOME` directory exists (return silently if not)
-  - [ ] 3.3 Iterate through directories in `$VENV_HOME` and filter for valid environment directories
-  - [ ] 3.4 Sort environment names alphabetically
-  - [ ] 3.5 Print each environment name (one per line)
-  - [ ] 3.6 Add subparser for `list` command with help text
-  - [ ] 3.7 Set command handler function (set_defaults)
+- [x] 3.0 Implement the `list` command
+  - [x] 3.1 Create `list_envs(args)` function
+  - [x] 3.2 Check if `$VENV_HOME` directory exists (return silently if not)
+  - [x] 3.3 Iterate through directories in `$VENV_HOME` and filter for valid environment directories
+  - [x] 3.4 Sort environment names alphabetically
+  - [x] 3.5 Print each environment name (one per line)
+  - [x] 3.6 Add subparser for `list` command with help text
+  - [x] 3.7 Set command handler function (set_defaults)
 
 - [ ] 4.0 Implement the `create` command with symlink and activation script generation
   - [ ] 4.1 Create `create_env(args)` function

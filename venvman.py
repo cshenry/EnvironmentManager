@@ -70,6 +70,15 @@ def python_version_str(python_bin: Path) -> str:
     return r.stdout.strip()
 
 
+def list_envs(args):
+    """List all virtual environments in $VENV_HOME."""
+    root = venv_home()
+    if not root.exists():
+        return
+    for p in sorted([d for d in root.iterdir() if d.is_dir()]):
+        print(p.name)
+
+
 def main():
     """Main entry point for the venvman CLI."""
     parser = argparse.ArgumentParser(
@@ -77,7 +86,9 @@ def main():
     )
     sub = parser.add_subparsers(dest="cmd", required=True)
 
-    # Subparsers will be added here for each command
+    # List command
+    p_list = sub.add_parser("list", help="List available environments under $VENV_HOME")
+    p_list.set_defaults(func=list_envs)
 
     args = parser.parse_args()
     args.func(args)
