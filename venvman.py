@@ -393,6 +393,25 @@ def info_env(args):
         pass
 
 
+def help_cmd(args):
+    """Display the full README documentation."""
+    # Get the directory where this script is located
+    script_dir = Path(__file__).parent.resolve()
+    readme_path = script_dir / "README.md"
+
+    if not readme_path.exists():
+        print("Error: README.md not found.", file=sys.stderr)
+        print(f"Expected location: {readme_path}", file=sys.stderr)
+        sys.exit(1)
+
+    try:
+        content = readme_path.read_text()
+        print(content)
+    except Exception as e:
+        print(f"Error reading README.md: {e}", file=sys.stderr)
+        sys.exit(1)
+
+
 def main():
     """Main entry point for the venvman CLI."""
     parser = argparse.ArgumentParser(
@@ -426,6 +445,10 @@ def main():
     info_group.add_argument("--project", help="Project name")
     info_group.add_argument("--env", help="Exact environment name")
     p_info.set_defaults(func=info_env)
+
+    # Help command
+    p_help = sub.add_parser("help", help="Display full README documentation")
+    p_help.set_defaults(func=help_cmd)
 
     args = parser.parse_args()
     args.func(args)
