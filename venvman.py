@@ -181,6 +181,64 @@ def create_env(args):
     print(f"Wrote {repo_dir/'activate.sh'} (source this to activate)")
 
 
+def delete_env(args):
+    """
+    Delete a virtual environment from $VENV_HOME.
+
+    Args:
+        args: Parsed command-line arguments
+    """
+    root = venv_home()
+
+    # Determine which environment to delete
+    if args.env:
+        env_dir = root / args.env
+    elif args.project:
+        # Search for matching environments
+        pattern = f"{args.project}-py*"
+        matches = list(root.glob(pattern)) if root.exists() else []
+
+        if len(matches) == 0:
+            print(f"No environments found for project: {args.project}", file=sys.stderr)
+            sys.exit(1)
+        elif len(matches) > 1:
+            print(f"Multiple environments found for project '{args.project}':", file=sys.stderr)
+            for m in matches:
+                print(f"  - {m.name}", file=sys.stderr)
+            print("Please specify --env with the exact environment name.", file=sys.stderr)
+            sys.exit(1)
+        else:
+            env_dir = matches[0]
+    else:
+        print("Error: Must specify either --project or --env", file=sys.stderr)
+        sys.exit(1)
+
+    # Validate environment exists
+    if not env_dir.exists():
+        print(f"Environment does not exist: {env_dir}", file=sys.stderr)
+        sys.exit(1)
+
+    # Warn and confirm
+    print(f"WARNING: About to delete: {env_dir}")
+    print("Note: Symlinks in project directories will NOT be automatically removed.")
+    response = input("Continue? (y/n): ").strip().lower()
+
+    if response != 'y' and response != 'yes':
+        print("Deletion cancelled.")
+        sys.exit(0)
+
+    # Delete the environment
+    try:
+        shutil.rmtree(env_dir)
+        print(f"Successfully deleted: {env_dir}")
+    except PermissionError as e:
+        print(f"Permission error while deleting environment: {e}", file=sys.stderr)
+        sys.exit(1)
+    except Exception as e:
+        print(f"Error deleting environment: {e}", file=sys.stderr)
+        sys.exit(1)
+
+
 def main():
     """Main entry point for the venvman CLI."""
     parser = argparse.ArgumentParser(
@@ -199,6 +257,13 @@ def main():
     p_create.add_argument("--dir", required=True, help="Project directory where .venv and activate.sh are placed")
     p_create.add_argument("--force", action="store_true", help="Replace existing .venv symlink / rewrite activate.sh")
     p_create.set_defaults(func=create_env)
+
+    # Delete command
+    p_delete = sub.add_parser("delete", help="Delete a virtual environment")
+    delete_group = p_delete.add_mutually_exclusive_group(required=True)
+    delete_group.add_argument("--project", help="Project name (deletes matching environment)")
+    delete_group.add_argument("--env", help="Exact environment name to delete")
+    p_delete.set_defaults(func=delete_env)
 
     args = parser.parse_args()
     args.func(args)

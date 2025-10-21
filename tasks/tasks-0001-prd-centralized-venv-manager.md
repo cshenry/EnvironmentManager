@@ -64,19 +64,19 @@
   - [x] 4.19 Print success messages showing environment path, symlink, and activate.sh location
   - [x] 4.20 Add comprehensive help text for create command
 
-- [ ] 5.0 Implement the `delete` command
-  - [ ] 5.1 Create `delete_env(args)` function
-  - [ ] 5.2 Add subparser for `delete` command with mutually exclusive arguments (--project OR --env)
-  - [ ] 5.3 If `--env` provided, construct full path to environment
-  - [ ] 5.4 If `--project` provided, search `$VENV_HOME` for matching environments (pattern: `<project>-py*`)
-  - [ ] 5.5 Handle ambiguous matches (multiple environments for same project): list them and ask user to specify --env
-  - [ ] 5.6 Validate that environment exists, exit with error if not found (FR8)
-  - [ ] 5.7 Print warning message showing what will be deleted
-  - [ ] 5.8 Prompt user for confirmation (y/n) before deletion
-  - [ ] 5.9 Remove environment directory using shutil.rmtree()
-  - [ ] 5.10 Handle permission errors during deletion (FR8)
-  - [ ] 5.11 Print success message confirming deletion
-  - [ ] 5.12 Add help text noting that symlinks in projects are NOT automatically removed
+- [x] 5.0 Implement the `delete` command
+  - [x] 5.1 Create `delete_env(args)` function
+  - [x] 5.2 Add subparser for `delete` command with mutually exclusive arguments (--project OR --env)
+  - [x] 5.3 If `--env` provided, construct full path to environment
+  - [x] 5.4 If `--project` provided, search `$VENV_HOME` for matching environments (pattern: `<project>-py*`)
+  - [x] 5.5 Handle ambiguous matches (multiple environments for same project): list them and ask user to specify --env
+  - [x] 5.6 Validate that environment exists, exit with error if not found (FR8)
+  - [x] 5.7 Print warning message showing what will be deleted
+  - [x] 5.8 Prompt user for confirmation (y/n) before deletion
+  - [x] 5.9 Remove environment directory using shutil.rmtree()
+  - [x] 5.10 Handle permission errors during deletion (FR8)
+  - [x] 5.11 Print success message confirming deletion
+  - [x] 5.12 Add help text noting that symlinks in projects are NOT automatically removed
 
 - [ ] 6.0 Implement the `info` command
   - [ ] 6.1 Create `info_env(args)` function
