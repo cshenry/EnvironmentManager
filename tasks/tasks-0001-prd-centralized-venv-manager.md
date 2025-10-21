@@ -24,14 +24,14 @@
   - [x] 1.7 Add main() function with argument parsing and command dispatch
   - [x] 1.8 Make venvman.py executable (chmod +x)
 
-- [ ] 2.0 Implement Python interpreter resolution and environment path management
-  - [ ] 2.1 Implement `find_python(pyver: str | None)` function with priority-based resolution
-  - [ ] 2.2 Add pyenv resolution logic (check if pyenv exists, run `pyenv which python<ver>`)
-  - [ ] 2.3 Add system python resolution (check for `python<ver>` using shutil.which)
-  - [ ] 2.4 Add fallback to `python3` if no version specified or version not found
-  - [ ] 2.5 Implement `python_version_str(python_bin: Path)` to extract MAJOR.MINOR version from interpreter
-  - [ ] 2.6 Add error handling for invalid/non-executable Python interpreters
-  - [ ] 2.7 Implement environment naming convention: `<project>-py<MAJOR.MINOR>`
+- [x] 2.0 Implement Python interpreter resolution and environment path management
+  - [x] 2.1 Implement `find_python(pyver: str | None)` function with priority-based resolution
+  - [x] 2.2 Add pyenv resolution logic (check if pyenv exists, run `pyenv which python<ver>`)
+  - [x] 2.3 Add system python resolution (check for `python<ver>` using shutil.which)
+  - [x] 2.4 Add fallback to `python3` if no version specified or version not found
+  - [x] 2.5 Implement `python_version_str(python_bin: Path)` to extract MAJOR.MINOR version from interpreter
+  - [x] 2.6 Add error handling for invalid/non-executable Python interpreters
+  - [x] 2.7 Implement environment naming convention: `<project>-py<MAJOR.MINOR>`
 
 - [ ] 3.0 Implement the `list` command
   - [ ] 3.1 Create `list_envs(args)` function

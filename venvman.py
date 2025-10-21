@@ -17,6 +17,59 @@ def run(cmd: list[str]) -> subprocess.CompletedProcess:
     return subprocess.run(cmd, check=False, stdout=subprocess.PIPE, stderr=subprocess.PIPE, text=True)
 
 
+def find_python(pyver: str | None) -> Path | None:
+    """
+    Find a suitable Python interpreter with priority-based resolution.
+
+    Priority:
+    1. pyenv (if available and version specified)
+    2. System python<version> (if version specified)
+    3. Fallback to python3
+
+    Args:
+        pyver: Python version string (e.g., "3.12") or None
+
+    Returns:
+        Path to Python interpreter or None if not found
+    """
+    # Try pyenv first if version specified
+    if pyver:
+        if shutil.which("pyenv"):
+            r = run(["pyenv", "which", f"python{pyver}"])
+            if r.returncode == 0:
+                p = Path(r.stdout.strip())
+                if p.exists():
+                    return p
+        # Then system python<ver>
+        cand = shutil.which(f"python{pyver}")
+        if cand:
+            return Path(cand)
+
+    # Fallback to python3
+    cand = shutil.which("python3")
+    return Path(cand) if cand else None
+
+
+def python_version_str(python_bin: Path) -> str:
+    """
+    Extract MAJOR.MINOR version from a Python interpreter.
+
+    Args:
+        python_bin: Path to Python interpreter
+
+    Returns:
+        Version string in format "MAJOR.MINOR" (e.g., "3.12")
+
+    Raises:
+        SystemExit: If unable to determine Python version
+    """
+    r = run([str(python_bin), "-c", "import sys; print(f'{sys.version_info.major}.{sys.version_info.minor}')"])
+    if r.returncode != 0:
+        print("Error reading python version", file=sys.stderr)
+        sys.exit(1)
+    return r.stdout.strip()
+
+
 def main():
     """Main entry point for the venvman CLI."""
     parser = argparse.ArgumentParser(
