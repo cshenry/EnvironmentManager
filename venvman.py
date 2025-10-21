@@ -138,6 +138,46 @@ echo "Activated $(readlink "$HERE/.venv")"
     script.chmod(0o755)
 
 
+def install_dependencies(env_dir: Path, repo_dir: Path):
+    """
+    Install dependencies from requirements.txt or pyproject.toml.
+
+    Args:
+        env_dir: Path to virtual environment
+        repo_dir: Path to project directory
+    """
+    pip_bin = env_dir / "bin" / "pip"
+    requirements_file = repo_dir / "requirements.txt"
+    pyproject_file = repo_dir / "pyproject.toml"
+
+    installed_any = False
+
+    # Install from requirements.txt
+    if requirements_file.exists():
+        print(f"\nInstalling dependencies from {requirements_file}...")
+        r = run([str(pip_bin), "install", "-r", str(requirements_file)])
+        if r.returncode == 0:
+            print("Successfully installed dependencies from requirements.txt")
+            installed_any = True
+        else:
+            print(f"WARNING: Failed to install from requirements.txt", file=sys.stderr)
+            print(r.stderr, file=sys.stderr)
+
+    # Install from pyproject.toml (editable install)
+    if pyproject_file.exists():
+        print(f"\nInstalling project from {pyproject_file} (editable mode)...")
+        r = run([str(pip_bin), "install", "-e", str(repo_dir)])
+        if r.returncode == 0:
+            print("Successfully installed project in editable mode")
+            installed_any = True
+        else:
+            print(f"WARNING: Failed to install from pyproject.toml", file=sys.stderr)
+            print(r.stderr, file=sys.stderr)
+
+    if not installed_any:
+        print("\nNo dependency files found (requirements.txt or pyproject.toml)")
+
+
 def create_env(args):
     """
     Create a virtual environment and link it into a project directory.
@@ -179,6 +219,10 @@ def create_env(args):
     # Write/refresh activate.sh
     write_activate_sh(repo_dir)
     print(f"Wrote {repo_dir/'activate.sh'} (source this to activate)")
+
+    # Install dependencies if requested
+    if args.install_deps:
+        install_dependencies(env_dir, repo_dir)
 
 
 def delete_env(args):
@@ -366,6 +410,7 @@ def main():
     p_create.add_argument("--python", help="Python version, e.g., 3.12")
     p_create.add_argument("--dir", required=True, help="Project directory where .venv and activate.sh are placed")
     p_create.add_argument("--force", action="store_true", help="Replace existing .venv symlink / rewrite activate.sh")
+    p_create.add_argument("--install-deps", action="store_true", help="Install dependencies from requirements.txt or pyproject.toml")
     p_create.set_defaults(func=create_env)
 
     # Delete command

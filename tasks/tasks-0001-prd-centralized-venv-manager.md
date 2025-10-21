@@ -92,17 +92,17 @@
   - [x] 6.11 Format output in readable way (consider using labels and alignment)
   - [x] 6.12 Add help text for info command
 
-- [ ] 7.0 Add dependency installation support (`--install-deps` flag)
-  - [ ] 7.1 Add `--install-deps` flag to create command subparser
-  - [ ] 7.2 In `create_env()`, check if `--install-deps` flag is set
-  - [ ] 7.3 After environment creation and symlink setup, check for `requirements.txt` in project directory
-  - [ ] 7.4 If `requirements.txt` exists, install using `<env>/bin/pip install -r requirements.txt`
-  - [ ] 7.5 Check for `pyproject.toml` in project directory
-  - [ ] 7.6 If `pyproject.toml` exists, install using `<env>/bin/pip install -e .` (editable install)
-  - [ ] 7.7 Handle case where both files exist (install both, requirements.txt first)
-  - [ ] 7.8 Capture and display pip output
-  - [ ] 7.9 If installation fails, print warning but continue with symlink/script creation (FR6)
-  - [ ] 7.10 Print success/failure message for dependency installation
+- [x] 7.0 Add dependency installation support (`--install-deps` flag)
+  - [x] 7.1 Add `--install-deps` flag to create command subparser
+  - [x] 7.2 In `create_env()`, check if `--install-deps` flag is set
+  - [x] 7.3 After environment creation and symlink setup, check for `requirements.txt` in project directory
+  - [x] 7.4 If `requirements.txt` exists, install using `<env>/bin/pip install -r requirements.txt`
+  - [x] 7.5 Check for `pyproject.toml` in project directory
+  - [x] 7.6 If `pyproject.toml` exists, install using `<env>/bin/pip install -e .` (editable install)
+  - [x] 7.7 Handle case where both files exist (install both, requirements.txt first)
+  - [x] 7.8 Capture and display pip output
+  - [x] 7.9 If installation fails, print warning but continue with symlink/script creation (FR6)
+  - [x] 7.10 Print success/failure message for dependency installation
 
 - [ ] 8.0 Create comprehensive documentation (README with examples)
   - [ ] 8.1 Create README.md file
