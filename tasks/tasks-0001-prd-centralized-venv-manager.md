@@ -78,19 +78,19 @@
   - [x] 5.11 Print success message confirming deletion
   - [x] 5.12 Add help text noting that symlinks in projects are NOT automatically removed
 
-- [ ] 6.0 Implement the `info` command
-  - [ ] 6.1 Create `info_env(args)` function
-  - [ ] 6.2 Add subparser for `info` command with mutually exclusive arguments (--project OR --env)
-  - [ ] 6.3 Resolve environment path (similar logic to delete command)
-  - [ ] 6.4 Validate that environment exists, exit with error if not found (FR8)
-  - [ ] 6.5 Display environment name
-  - [ ] 6.6 Display full path to environment directory
-  - [ ] 6.7 Extract and display Python version from environment name (parse `py<MAJOR.MINOR>`)
-  - [ ] 6.8 Attempt to read Python interpreter path from `pyvenv.cfg` file
-  - [ ] 6.9 Calculate environment size on disk (recursively sum all files)
-  - [ ] 6.10 Get creation date from directory metadata (os.path.getctime or stat)
-  - [ ] 6.11 Format output in readable way (consider using labels and alignment)
-  - [ ] 6.12 Add help text for info command
+- [x] 6.0 Implement the `info` command
+  - [x] 6.1 Create `info_env(args)` function
+  - [x] 6.2 Add subparser for `info` command with mutually exclusive arguments (--project OR --env)
+  - [x] 6.3 Resolve environment path (similar logic to delete command)
+  - [x] 6.4 Validate that environment exists, exit with error if not found (FR8)
+  - [x] 6.5 Display environment name
+  - [x] 6.6 Display full path to environment directory
+  - [x] 6.7 Extract and display Python version from environment name (parse `py<MAJOR.MINOR>`)
+  - [x] 6.8 Attempt to read Python interpreter path from `pyvenv.cfg` file
+  - [x] 6.9 Calculate environment size on disk (recursively sum all files)
+  - [x] 6.10 Get creation date from directory metadata (os.path.getctime or stat)
+  - [x] 6.11 Format output in readable way (consider using labels and alignment)
+  - [x] 6.12 Add help text for info command
 
 - [ ] 7.0 Add dependency installation support (`--install-deps` flag)
   - [ ] 7.1 Add `--install-deps` flag to create command subparser

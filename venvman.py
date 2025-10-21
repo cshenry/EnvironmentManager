@@ -239,6 +239,116 @@ def delete_env(args):
         sys.exit(1)
 
 
+def get_dir_size(path: Path) -> int:
+    """
+    Calculate total size of a directory recursively.
+
+    Args:
+        path: Path to directory
+
+    Returns:
+        Total size in bytes
+    """
+    total = 0
+    try:
+        for entry in path.rglob('*'):
+            if entry.is_file():
+                total += entry.stat().st_size
+    except Exception:
+        pass
+    return total
+
+
+def format_size(size_bytes: int) -> str:
+    """
+    Format size in bytes to human-readable string.
+
+    Args:
+        size_bytes: Size in bytes
+
+    Returns:
+        Formatted string (e.g., "1.5 MB")
+    """
+    for unit in ['B', 'KB', 'MB', 'GB']:
+        if size_bytes < 1024.0:
+            return f"{size_bytes:.1f} {unit}"
+        size_bytes /= 1024.0
+    return f"{size_bytes:.1f} TB"
+
+
+def info_env(args):
+    """
+    Display information about a virtual environment.
+
+    Args:
+        args: Parsed command-line arguments
+    """
+    root = venv_home()
+
+    # Resolve environment path (similar to delete)
+    if args.env:
+        env_dir = root / args.env
+    elif args.project:
+        pattern = f"{args.project}-py*"
+        matches = list(root.glob(pattern)) if root.exists() else []
+
+        if len(matches) == 0:
+            print(f"No environments found for project: {args.project}", file=sys.stderr)
+            sys.exit(1)
+        elif len(matches) > 1:
+            print(f"Multiple environments found for project '{args.project}':", file=sys.stderr)
+            for m in matches:
+                print(f"  - {m.name}", file=sys.stderr)
+            print("Please specify --env with the exact environment name.", file=sys.stderr)
+            sys.exit(1)
+        else:
+            env_dir = matches[0]
+    else:
+        print("Error: Must specify either --project or --env", file=sys.stderr)
+        sys.exit(1)
+
+    # Validate environment exists
+    if not env_dir.exists():
+        print(f"Environment does not exist: {env_dir}", file=sys.stderr)
+        sys.exit(1)
+
+    # Display information
+    print(f"Environment: {env_dir.name}")
+    print(f"Path:        {env_dir}")
+
+    # Extract Python version from name
+    import re
+    match = re.search(r'py(\d+\.\d+)', env_dir.name)
+    if match:
+        print(f"Python:      {match.group(1)}")
+
+    # Try to read interpreter path from pyvenv.cfg
+    pyvenv_cfg = env_dir / "pyvenv.cfg"
+    if pyvenv_cfg.exists():
+        try:
+            content = pyvenv_cfg.read_text()
+            for line in content.split('\n'):
+                if line.startswith('home = '):
+                    home = line.split('=', 1)[1].strip()
+                    print(f"Interpreter: {home}")
+                    break
+        except Exception:
+            pass
+
+    # Calculate size
+    size_bytes = get_dir_size(env_dir)
+    print(f"Size:        {format_size(size_bytes)}")
+
+    # Get creation date
+    try:
+        import time
+        ctime = env_dir.stat().st_ctime
+        created = time.strftime('%Y-%m-%d %H:%M:%S', time.localtime(ctime))
+        print(f"Created:     {created}")
+    except Exception:
+        pass
+
+
 def main():
     """Main entry point for the venvman CLI."""
     parser = argparse.ArgumentParser(
@@ -264,6 +374,13 @@ def main():
     delete_group.add_argument("--project", help="Project name (deletes matching environment)")
     delete_group.add_argument("--env", help="Exact environment name to delete")
     p_delete.set_defaults(func=delete_env)
+
+    # Info command
+    p_info = sub.add_parser("info", help="Display information about an environment")
+    info_group = p_info.add_mutually_exclusive_group(required=True)
+    info_group.add_argument("--project", help="Project name")
+    info_group.add_argument("--env", help="Exact environment name")
+    p_info.set_defaults(func=info_env)
 
     args = parser.parse_args()
     args.func(args)
