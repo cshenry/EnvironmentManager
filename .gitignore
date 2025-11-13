@@ -10,17 +10,16 @@ __pycache__/
 venv/
 ENV/
 env/
-
 # Project-specific
 activate.sh
-
 # IDE
 .vscode/
 .idea/
 *.swp
 *.swo
 *~
-
 # OS
 .DS_Store
 Thumbs.db
+# Cursor workspace files
+*.code-workspace

@@ -8,8 +8,8 @@ from pathlib import Path
 
 
 def venv_home() -> Path:
-    """Get the virtual environment home directory from $VENV_HOME or default."""
-    return Path(os.environ.get("VENV_HOME", str(Path.home() / "VirtualEnvironments")))
+    """Get the virtual environment home directory from $VENVMAN_DIRECTORY or default."""
+    return Path(os.environ.get("VENVMAN_DIRECTORY", str(Path.home() / "VirtualEnvironments")))
 
 
 def run(cmd: list[str]) -> subprocess.CompletedProcess:
@@ -24,7 +24,7 @@ def find_python(pyver: str | None) -> Path | None:
     Priority:
     1. pyenv (if available and version specified)
     2. System python<version> (if version specified)
-    3. Fallback to python3
+    3. Fallback to python3 (only if no specific version requested)
 
     Args:
         pyver: Python version string (e.g., "3.12") or None
@@ -44,8 +44,11 @@ def find_python(pyver: str | None) -> Path | None:
         cand = shutil.which(f"python{pyver}")
         if cand:
             return Path(cand)
+        # If a specific version was requested but not found, return None
+        # Don't fallback to python3 as that would ignore the user's version requirement
+        return None
 
-    # Fallback to python3
+    # Fallback to python3 only when no specific version was requested
     cand = shutil.which("python3")
     return Path(cand) if cand else None
 
@@ -71,7 +74,7 @@ def python_version_str(python_bin: Path) -> str:
 
 
 def list_envs(args):
-    """List all virtual environments in $VENV_HOME."""
+    """List all virtual environments in $VENVMAN_DIRECTORY."""
     root = venv_home()
     if not root.exists():
         return
@@ -108,33 +111,31 @@ def ensure_symlink(link: Path, target: Path, force: bool):
     link.symlink_to(target)
 
 
-def write_activate_sh(repo_dir: Path):
+def write_activate_sh(repo_dir: Path, env_dir: Path):
     """
     Generate activate.sh script in the project directory.
 
     Args:
         repo_dir: Path to the project directory
+        env_dir: Path to the virtual environment directory
     """
     script = repo_dir / "activate.sh"
-    script.write_text("""#!/usr/bin/env bash
+    script_content = f"""#!/usr/bin/env bash
 # Source this file to activate the project environment.
 set -euo pipefail
 
-HERE="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
-if [ ! -L "$HERE/.venv" ]; then
-  echo "Error: $HERE/.venv is not a symlink. Did you run venvman.py create?" >&2
-  return 1 2>/dev/null || exit 1
-fi
+VENV_PATH="{env_dir}"
 
-if [ ! -f "$HERE/.venv/bin/activate" ]; then
-  echo "Error: $HERE/.venv/bin/activate not found. Was the venv created successfully?" >&2
+if [ ! -f "$VENV_PATH/bin/activate" ]; then
+  echo "Error: $VENV_PATH/bin/activate not found. Was the venv created successfully?" >&2
   return 1 2>/dev/null || exit 1
 fi
 
 # shellcheck disable=SC1090
-source "$HERE/.venv/bin/activate"
-echo "Activated $(readlink "$HERE/.venv")"
-""")
+source "$VENV_PATH/bin/activate"
+echo "Activated $VENV_PATH"
+"""
+    script.write_text(script_content)
     script.chmod(0o755)
 
 
@@ -195,7 +196,12 @@ def create_env(args):
 
     py = find_python(args.python)
     if not py:
-        print("No suitable python interpreter found.", file=sys.stderr)
+        if args.python:
+            print(f"Error: Python {args.python} not found.", file=sys.stderr)
+            print(f"Searched for: pyenv python{args.python}, python{args.python} in PATH", file=sys.stderr)
+            print(f"Tip: Install Python {args.python} via pyenv or ensure python{args.python} is in your PATH", file=sys.stderr)
+        else:
+            print("No suitable python interpreter found.", file=sys.stderr)
         sys.exit(1)
 
     ver = python_version_str(py)
@@ -217,7 +223,7 @@ def create_env(args):
     print(f"Linked {link} -> {env_dir}")
 
     # Write/refresh activate.sh
-    write_activate_sh(repo_dir)
+    write_activate_sh(repo_dir, env_dir)
     print(f"Wrote {repo_dir/'activate.sh'} (source this to activate)")
 
     # Install dependencies if requested
@@ -227,7 +233,7 @@ def create_env(args):
 
 def delete_env(args):
     """
-    Delete a virtual environment from $VENV_HOME.
+    Delete a virtual environment from $VENVMAN_DIRECTORY.
 
     Args:
         args: Parsed command-line arguments
@@ -393,6 +399,135 @@ def info_env(args):
         pass
 
 
+def update_shell_rc(new_directory: str) -> bool:
+    """
+    Update shell RC file (.bash_profile or .bashrc) with VENVMAN_DIRECTORY.
+
+    Args:
+        new_directory: Path to set as VENVMAN_DIRECTORY
+
+    Returns:
+        True if successful, False otherwise
+    """
+    home = Path.home()
+    rc_files = [home / ".bash_profile", home / ".bashrc"]
+
+    # Find the first existing RC file, or default to .bash_profile
+    target_rc = None
+    for rc_file in rc_files:
+        if rc_file.exists():
+            target_rc = rc_file
+            break
+
+    if target_rc is None:
+        target_rc = rc_files[0]  # Default to .bash_profile
+
+    # Read existing content
+    if target_rc.exists():
+        content = target_rc.read_text()
+        lines = content.split('\n')
+    else:
+        lines = []
+
+    # Check if VENVMAN_DIRECTORY is already set and update/add it
+    export_line = f'export VENVMAN_DIRECTORY="{new_directory}"'
+    found = False
+
+    for i, line in enumerate(lines):
+        if line.strip().startswith('export VENVMAN_DIRECTORY='):
+            lines[i] = export_line
+            found = True
+            break
+
+    if not found:
+        # Add it at the end
+        if lines and lines[-1] != '':
+            lines.append('')
+        lines.append('# venvman: Virtual environment home directory')
+        lines.append(export_line)
+
+    # Write back
+    try:
+        target_rc.write_text('\n'.join(lines))
+        print(f"Updated {target_rc}")
+        return True
+    except Exception as e:
+        print(f"Error updating {target_rc}: {e}", file=sys.stderr)
+        return False
+
+
+def set_home(args):
+    """
+    Set the VENVMAN_DIRECTORY environment variable and migrate existing environments.
+
+    Args:
+        args: Parsed command-line arguments
+    """
+    new_dir = Path(args.directory).expanduser().resolve()
+    current_dir = venv_home()
+
+    print(f"Current directory: {current_dir}")
+    print(f"New directory:     {new_dir}")
+
+    # Check if new directory is the same as current
+    if new_dir == current_dir:
+        print("\nNew directory is the same as the current directory. No changes needed.")
+        sys.exit(0)
+
+    # Check if there are environments in the current location
+    environments_to_migrate = []
+    if current_dir.exists() and current_dir.is_dir():
+        environments_to_migrate = [d for d in current_dir.iterdir() if d.is_dir()]
+
+    if environments_to_migrate:
+        print(f"\nFound {len(environments_to_migrate)} environment(s) in current location:")
+        for env in environments_to_migrate:
+            print(f"  - {env.name}")
+
+        response = input("\nMigrate these environments to the new location? (y/n): ").strip().lower()
+        if response == 'y' or response == 'yes':
+            # Create new directory if it doesn't exist
+            new_dir.mkdir(parents=True, exist_ok=True)
+
+            # Migrate each environment
+            print("\nMigrating environments...")
+            for env in environments_to_migrate:
+                dest = new_dir / env.name
+                if dest.exists():
+                    print(f"  Skipping {env.name} (already exists in destination)")
+                else:
+                    try:
+                        shutil.copytree(env, dest)
+                        print(f"  Copied {env.name}")
+                    except Exception as e:
+                        print(f"  Error copying {env.name}: {e}", file=sys.stderr)
+
+            print("\nMigration complete.")
+            response = input("Delete old environments? (y/n): ").strip().lower()
+            if response == 'y' or response == 'yes':
+                for env in environments_to_migrate:
+                    try:
+                        shutil.rmtree(env)
+                        print(f"  Deleted {env.name}")
+                    except Exception as e:
+                        print(f"  Error deleting {env.name}: {e}", file=sys.stderr)
+        else:
+            print("Migration skipped.")
+    else:
+        # No environments to migrate, just create the directory
+        new_dir.mkdir(parents=True, exist_ok=True)
+        print(f"\nCreated directory: {new_dir}")
+
+    # Update shell RC file
+    print("\nUpdating shell configuration...")
+    if update_shell_rc(str(new_dir)):
+        print(f"\nVENVMAN_DIRECTORY has been set to: {new_dir}")
+        print("Please restart your shell or run: source ~/.bash_profile (or ~/.bashrc)")
+    else:
+        print("\nFailed to update shell configuration.", file=sys.stderr)
+        sys.exit(1)
+
+
 def help_cmd(args):
     """Display the full README documentation."""
     # Get the directory where this script is located
@@ -420,7 +555,7 @@ def main():
     sub = parser.add_subparsers(dest="cmd", required=True)
 
     # List command
-    p_list = sub.add_parser("list", help="List available environments under $VENV_HOME")
+    p_list = sub.add_parser("list", help="List available environments under $VENVMAN_DIRECTORY")
     p_list.set_defaults(func=list_envs)
 
     # Create command
@@ -445,6 +580,11 @@ def main():
     info_group.add_argument("--project", help="Project name")
     info_group.add_argument("--env", help="Exact environment name")
     p_info.set_defaults(func=info_env)
+
+    # Set home command
+    p_set_home = sub.add_parser("set_home", help="Set the VENVMAN_DIRECTORY and migrate environments")
+    p_set_home.add_argument("directory", help="New directory path for virtual environments")
+    p_set_home.set_defaults(func=set_home)
 
     # Help command
     p_help = sub.add_parser("help", help="Display full README documentation")
