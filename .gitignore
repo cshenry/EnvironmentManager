@@ -12,6 +12,7 @@ ENV/
 env/
 # Project-specific
 activate.sh
+data/
 # IDE
 .vscode/
 .idea/
